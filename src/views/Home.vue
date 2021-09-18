@@ -5,20 +5,20 @@
         <span class="inline-block w-1/4">パラメータ名</span>
         <span class="inline-block w-2/3 ml-4">値（カンマ区切り）</span>
       </div>
-      <div v-for="index in inputCount" :key="index" class="mt-2">
-        <input-text class="w-1/4"></input-text>
-        <input-text class="w-2/3 ml-4"></input-text>
+      <div v-for="(factor, index) in factors" :key="index" class="mt-2">
+        <input-text class="w-1/4" v-model="factors[index].name" />
+        <input-text class="w-2/3 ml-4" v-model="factors[index].choices"></input-text>
       </div>
 
       <div class="mt-2">
-        <button-secondary @click="incrementInputCount" class="w-full text-center block">
+        <button-secondary @click="addFactor" class="w-full text-center block">
           <span>パラメータを追加する</span>
         </button-secondary>
       </div>
     </div>
 
     <div class="mt-4">
-      <button-primary @click="handleGenerate">テストケース生成</button-primary>
+      <button-primary @click="handleGenerate(factors)">テストケース生成</button-primary>
     </div>
 
     <div class="mt-8">
@@ -38,7 +38,7 @@
       </table>
     </div>
 
-    <div class="mt-10">
+    <!-- <div class="mt-10">
       <div class="grid-header">
         <div class="grid-item"></div>
         <div v-for="(item, index) in factors.flat()" :key="index" class="grid-item">{{ item }}</div>
@@ -47,12 +47,12 @@
         <div class="grid-item">{{ item }}</div>
         <div v-for="(item, index) in factors.flat()" :key="index" class="grid-item">{{ index }}</div>
       </div>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script>
-import { ref, reactive } from 'vue';
+import { reactive } from 'vue';
 import ButtonPrimary from '@/components/ButtonPrimary';
 import ButtonSecondary from '@/components/ButtonSecondary';
 import InputText from '@/components/InputText';
@@ -68,26 +68,31 @@ export default {
   },
 
   setup() {
-    const factors = reactive([
-      ['S', 'M', 'L'],
-      ['Red', 'Black', 'White', 'Blue'],
-      [1000, 3000],
-    ]);
+    // const factors = reactive([
+    //   ['S', 'M', 'L'],
+    //   ['Red', 'Black', 'White', 'Blue'],
+    //   [1000, 3000],
+    // ]);
     let testCases = reactive([]);
 
-    const handleGenerate = () => {
-      const results = generateTestCases(factors);
+    const handleGenerate = (factors) => {
+      console.log(factors.map((factor) => factor.choices.split(',')));
+      const results = generateTestCases(factors.map((factor) => factor.choices.split(',')));
 
-      // 直接代入すると変更が反映されなかったため、forEachで代入している
+      // 直接代入すると変更が反映されなかったため、空にしてからforEachで代入している
+      while (testCases.length > 0) testCases.pop();
       results.forEach((testCase) => testCases.push(testCase));
     };
 
-    let inputCount = ref(1);
-    const incrementInputCount = () => {
-      inputCount.value++;
+    const factors = reactive([
+      { name: 'サイズ', choices: 'S,M,L' },
+      { name: '色', choices: 'Red,Black,White,Blue' },
+    ]);
+    const addFactor = () => {
+      factors.push({ name: '', choices: '' });
     };
 
-    return { factors, testCases, handleGenerate, inputCount, incrementInputCount };
+    return { factors, addFactor, testCases, handleGenerate };
   },
 };
 </script>
