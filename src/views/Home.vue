@@ -1,6 +1,27 @@
 <template>
-  <div class="grid-container">
-    <div class="grid">
+  <div class="container mx-auto">
+    <div>
+      <button-primary @click="handleGenerate">テストケース生成</button-primary>
+    </div>
+
+    <div class="mt-10">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-4 py-1 text-left"></th>
+            <th class="px-4 py-1 text-left">サイズ</th>
+            <th class="px-4 py-1 text-left">色</th>
+            <th class="px-4 py-1 text-left">値段</th>
+          </tr>
+        </thead>
+        <tr v-for="(testCase, index) in testCases" :key="index">
+          <td class="py-1">{{ index + 1 }}</td>
+          <td v-for="(factor, index) in testCase" :key="index" class="py-1">{{ factor }}</td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="mt-10">
       <div class="grid-header">
         <div class="grid-item"></div>
         <div v-for="(item, index) in factors.flat()" :key="index" class="grid-item">{{ item }}</div>
@@ -10,28 +31,20 @@
         <div v-for="(item, index) in factors.flat()" :key="index" class="grid-item">{{ index }}</div>
       </div>
     </div>
-
-    <div>
-      <button @click="handleGenerate">テストケース生成</button>
-    </div>
-
-    <div>
-      <table>
-        <tr v-for="(testCase, index) in testCases" :key="index">
-          <td>{{ index }}</td>
-          <td v-for="(factor, index) in testCase" :key="index">{{ factor }}</td>
-        </tr>
-      </table>
-    </div>
   </div>
 </template>
 
 <script>
 import { reactive } from 'vue';
+import ButtonPrimary from '@/components/buttonPrimary';
 import generateTestCases from '@/lib/generateTestCases';
 
 export default {
   name: 'Home',
+
+  components: {
+    ButtonPrimary,
+  },
 
   setup() {
     const factors = reactive([
@@ -69,5 +82,9 @@ export default {
 .grid-item {
   height: 4rem;
   width: 4rem;
+}
+
+.testcase-container {
+  max-width: 800px;
 }
 </style>
