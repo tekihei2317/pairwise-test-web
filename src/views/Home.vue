@@ -22,41 +22,35 @@
     </div>
 
     <div class="mt-8">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-4 py-1 text-left"></th>
-            <th class="px-4 py-1 text-left">サイズ</th>
-            <th class="px-4 py-1 text-left">色</th>
-            <th class="px-4 py-1 text-left">値段</th>
-          </tr>
-        </thead>
-        <tr v-for="(testCase, index) in testCases" :key="index">
-          <td class="py-1">{{ index + 1 }}</td>
-          <td v-for="(factor, index) in testCase" :key="index" class="py-1">{{ factor }}</td>
-        </tr>
-      </table>
+      <div>
+        <router-link :to="{ name: 'Home', query: { display_type: 'table' } }" class="hover:underline text-green-600">
+          テーブル表示
+        </router-link>
+        <span> | </span>
+        <router-link :to="{ name: 'Home', query: { display_type: 'grid' } }" class="hover:underline text-green-500">
+          グリッド表示
+        </router-link>
+      </div>
+      <div v-if="$route.query.display_type !== 'grid'">
+        <test-cases :factors="factors" :testCases="testCases" />
+      </div>
+      <div v-else>
+        <test-cases-grid :factors="factors.map((factor) => factor.choices.split(','))" />
+      </div>
     </div>
-
-    <!-- <div class="mt-10">
-      <div class="grid-header">
-        <div class="grid-item"></div>
-        <div v-for="(item, index) in factors.flat()" :key="index" class="grid-item">{{ item }}</div>
-      </div>
-      <div v-for="(item, index) in factors.flat()" :key="index" class="grid-row">
-        <div class="grid-item">{{ item }}</div>
-        <div v-for="(item, index) in factors.flat()" :key="index" class="grid-item">{{ index }}</div>
-      </div>
-    </div> -->
   </div>
 </template>
 
 <script>
 import { reactive } from 'vue';
+import generateTestCases from '@/lib/generateTestCases';
+
+// components
 import ButtonPrimary from '@/components/ButtonPrimary';
 import ButtonSecondary from '@/components/ButtonSecondary';
 import InputText from '@/components/InputText';
-import generateTestCases from '@/lib/generateTestCases';
+import TestCases from '@/components/TestCases';
+import TestCasesGrid from '@/components/TestCasesGrid';
 
 export default {
   name: 'Home',
@@ -65,18 +59,13 @@ export default {
     ButtonPrimary,
     ButtonSecondary,
     InputText,
+    TestCases,
+    TestCasesGrid,
   },
 
   setup() {
-    // const factors = reactive([
-    //   ['S', 'M', 'L'],
-    //   ['Red', 'Black', 'White', 'Blue'],
-    //   [1000, 3000],
-    // ]);
-    let testCases = reactive([]);
-
+    const testCases = reactive([]);
     const handleGenerate = (factors) => {
-      console.log(factors.map((factor) => factor.choices.split(',')));
       const results = generateTestCases(factors.map((factor) => factor.choices.split(',')));
 
       // 直接代入すると変更が反映されなかったため、空にしてからforEachで代入している
@@ -98,19 +87,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.grid-header {
-  display: flex;
-  justify-content: center;
-}
-.grid-row {
-  display: flex;
-  justify-content: center;
-}
-.grid-item {
-  height: 4rem;
-  width: 4rem;
-}
-
 .form-container {
   max-width: 800px;
 }
