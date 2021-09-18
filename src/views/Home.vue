@@ -1,10 +1,27 @@
 <template>
   <div class="container mx-auto">
-    <div>
+    <div class="form-container">
+      <div>
+        <span class="inline-block w-1/4">パラメータ名</span>
+        <span class="inline-block w-2/3 ml-4">値（カンマ区切り）</span>
+      </div>
+      <div v-for="index in inputCount" :key="index" class="mt-2">
+        <input-text class="w-1/4"></input-text>
+        <input-text class="w-2/3 ml-4"></input-text>
+      </div>
+
+      <div class="mt-2">
+        <button-secondary @click="incrementInputCount" class="w-full text-center block">
+          <span>パラメータを追加する</span>
+        </button-secondary>
+      </div>
+    </div>
+
+    <div class="mt-4">
       <button-primary @click="handleGenerate">テストケース生成</button-primary>
     </div>
 
-    <div class="mt-10">
+    <div class="mt-8">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
@@ -35,8 +52,10 @@
 </template>
 
 <script>
-import { reactive } from 'vue';
-import ButtonPrimary from '@/components/buttonPrimary';
+import { ref, reactive } from 'vue';
+import ButtonPrimary from '@/components/ButtonPrimary';
+import ButtonSecondary from '@/components/ButtonSecondary';
+import InputText from '@/components/InputText';
 import generateTestCases from '@/lib/generateTestCases';
 
 export default {
@@ -44,6 +63,8 @@ export default {
 
   components: {
     ButtonPrimary,
+    ButtonSecondary,
+    InputText,
   },
 
   setup() {
@@ -61,16 +82,17 @@ export default {
       results.forEach((testCase) => testCases.push(testCase));
     };
 
-    return { factors, testCases, handleGenerate };
+    let inputCount = ref(1);
+    const incrementInputCount = () => {
+      inputCount.value++;
+    };
+
+    return { factors, testCases, handleGenerate, inputCount, incrementInputCount };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.grid {
-  max-width: 1000px;
-  margin: 0 auto;
-}
 .grid-header {
   display: flex;
   justify-content: center;
@@ -84,7 +106,11 @@ export default {
   width: 4rem;
 }
 
-.testcase-container {
+.form-container {
   max-width: 800px;
+}
+
+.container {
+  max-width: 1000px;
 }
 </style>
