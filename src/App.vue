@@ -1,6 +1,6 @@
 <template>
   <div id="nav" class="mx-auto">
-    <router-link to="/" class="text-xl">pairise-test-web</router-link>
+    <router-link to="/" class="text-xl">pairwise-test-web</router-link>
   </div>
   <router-view />
 </template>

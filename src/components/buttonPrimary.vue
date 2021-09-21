@@ -9,9 +9,9 @@
       shadow-sm
       text-sm
       font-medium
+      bg-green-600
       text-white
-      bg-indigo-600
-      hover:bg-indigo-700
+      hover:bg-green-500
       focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
     "
   >

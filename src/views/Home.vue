@@ -35,14 +35,14 @@
         <test-cases :factors="factors" :testCases="testCases" />
       </div>
       <div v-else>
-        <test-cases-grid :factors="factors.map((factor) => factor.choices.split(','))" :grid="testCasesGrid" />
+        <test-cases-grid :factors="choicesList" :grid="testCasesGrid" />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { reactive } from 'vue';
+import { reactive, computed } from 'vue';
 import generateTestCases from '@/lib/generateTestCases';
 
 // components
@@ -67,7 +67,9 @@ export default {
     const testCases = reactive([]);
     const testCasesGrid = reactive([]);
     const handleGenerate = (factors) => {
-      const { results, grid } = generateTestCases(factors.map((factor) => factor.choices.split(',')));
+      const { results, grid } = generateTestCases(
+        factors.filter((factor) => factor.choices.trim() !== '').map((factor) => factor.choices.split(','))
+      );
 
       // 直接代入すると変更が反映されなかったため、空にしてからforEachで代入している
       while (testCases.length > 0) testCases.pop();
@@ -77,15 +79,20 @@ export default {
       grid.forEach((row) => testCasesGrid.push(row));
     };
 
+    // フォームの値をバインドする用の配列
     const factors = reactive([
       { name: 'サイズ', choices: 'S,M,L' },
       { name: '色', choices: 'Red,Black,White,Blue' },
+      // { name: '値段', choices: '1000,3000,5000' },
     ]);
     const addFactor = () => {
       factors.push({ name: '', choices: '' });
     };
+    const choicesList = computed(() => {
+      return factors.filter((factor) => factor.choices.trim() !== '').map((factor) => factor.choices.split(','));
+    });
 
-    return { factors, testCases, testCasesGrid, addFactor, handleGenerate };
+    return { factors, testCases, testCasesGrid, choicesList, addFactor, handleGenerate };
   },
 };
 </script>

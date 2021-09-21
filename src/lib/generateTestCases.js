@@ -12,7 +12,7 @@ const generateTestCase = (i, j, currentGrid, factors, testCaseIndex) => {
     const factor = factors[factorIndex];
 
     for (let k = startIndex; k < startIndex + factor.length; k++) {
-      const point = current.reduce((sum, index) => sum + (currentGrid[index][k] === -1));
+      const point = current.reduce((sum, index) => sum + (currentGrid[index][k] === -1), 0);
       if (point > maxPoint) {
         maxPoint = point;
         maxPointIndex = k;
