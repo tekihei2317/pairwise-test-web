@@ -6,8 +6,9 @@
         <span class="inline-block w-2/3 ml-4">値（カンマ区切り）</span>
       </div>
       <div v-for="(factor, index) in factors" :key="index" class="mt-2">
-        <input-text class="w-1/4" v-model="factors[index].name" />
-        <input-text class="w-2/3 ml-4" v-model="factors[index].choices"></input-text>
+        <input-text class="w-1/4" v-model="factor.name" />
+        <input-text class="w-2/3 ml-4" v-model="factor.choices"></input-text>
+        <trash-icon class="h-5 w-5 ml-2 cursor-pointer inline-block" @click="removeFactor(index)" />
       </div>
 
       <div class="mt-2">
@@ -44,6 +45,7 @@
 <script>
 import { reactive, computed } from 'vue';
 import generateTestCases from '@/lib/generateTestCases';
+import { TrashIcon } from '@heroicons/vue/outline';
 
 // components
 import ButtonPrimary from '@/components/ButtonPrimary';
@@ -61,6 +63,7 @@ export default {
     InputText,
     TestCases,
     TestCasesGrid,
+    TrashIcon,
   },
 
   setup() {
@@ -80,7 +83,7 @@ export default {
     };
 
     // フォームの値をバインドする用の配列
-    const factors = reactive([
+    let factors = reactive([
       { name: 'サイズ', choices: 'S,M,L' },
       { name: '色', choices: 'Red,Black,White,Blue' },
       // { name: '値段', choices: '1000,3000,5000' },
@@ -88,11 +91,14 @@ export default {
     const addFactor = () => {
       factors.push({ name: '', choices: '' });
     };
+    const removeFactor = (removeIndex, removeCount = 1) => {
+      factors.splice(removeIndex, removeCount);
+    };
     const choicesList = computed(() => {
       return factors.filter((factor) => factor.choices.trim() !== '').map((factor) => factor.choices.split(','));
     });
 
-    return { factors, testCases, testCasesGrid, choicesList, addFactor, handleGenerate };
+    return { factors, testCases, testCasesGrid, choicesList, addFactor, removeFactor, handleGenerate };
   },
 };
 </script>
