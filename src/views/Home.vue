@@ -1,18 +1,114 @@
 <template>
-  <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png" />
-    <HelloWorld msg="Welcome to Your Vue.js App" />
+  <div class="container mx-auto">
+    <div class="form-container">
+      <div>
+        <span class="inline-block w-1/4">パラメータ名</span>
+        <span class="inline-block w-2/3 ml-4">値（カンマ区切り）</span>
+      </div>
+      <div v-for="(factor, index) in factors" :key="index" class="mt-2">
+        <input-text class="w-1/4" v-model="factor.name" />
+        <input-text class="w-2/3 ml-4" v-model="factor.choices"></input-text>
+        <trash-icon class="h-5 w-5 ml-2 cursor-pointer inline-block" @click="removeFactor(index)" />
+      </div>
+
+      <div class="mt-2">
+        <button-secondary @click="addFactor" class="w-full text-center block">
+          <span>パラメータを追加する</span>
+        </button-secondary>
+      </div>
+    </div>
+
+    <div class="mt-4">
+      <button-primary @click="handleGenerate(factors)">テストケース生成</button-primary>
+    </div>
+
+    <div class="mt-8">
+      <div>
+        <router-link :to="{ name: 'Home', query: { display_type: 'table' } }" class="hover:underline text-green-600">
+          テーブル表示
+        </router-link>
+        <span> | </span>
+        <router-link :to="{ name: 'Home', query: { display_type: 'grid' } }" class="hover:underline text-green-500">
+          グリッド表示
+        </router-link>
+      </div>
+      <div v-if="$route.query.display_type !== 'grid'">
+        <test-cases :factors="factors" :testCases="testCases" />
+      </div>
+      <div v-else>
+        <test-cases-grid :factors="choicesList" :grid="testCasesGrid" />
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
-// @ is an alias to /src
-import HelloWorld from "@/components/HelloWorld.vue";
+import { reactive, computed } from 'vue';
+import generateTestCases from '@/lib/generateTestCases';
+import { TrashIcon } from '@heroicons/vue/outline';
+
+// components
+import ButtonPrimary from '@/components/ButtonPrimary';
+import ButtonSecondary from '@/components/ButtonSecondary';
+import InputText from '@/components/InputText';
+import TestCases from '@/components/TestCases';
+import TestCasesGrid from '@/components/TestCasesGrid';
 
 export default {
-  name: "Home",
+  name: 'Home',
+
   components: {
-    HelloWorld,
+    ButtonPrimary,
+    ButtonSecondary,
+    InputText,
+    TestCases,
+    TestCasesGrid,
+    TrashIcon,
+  },
+
+  setup() {
+    const testCases = reactive([]);
+    const testCasesGrid = reactive([]);
+    const handleGenerate = (factors) => {
+      const { results, grid } = generateTestCases(
+        factors.filter((factor) => factor.choices.trim() !== '').map((factor) => factor.choices.split(','))
+      );
+
+      // 直接代入すると変更が反映されなかったため、空にしてからforEachで代入している
+      while (testCases.length > 0) testCases.pop();
+      results.forEach((testCase) => testCases.push(testCase));
+
+      while (testCasesGrid.length > 0) testCasesGrid.pop();
+      grid.forEach((row) => testCasesGrid.push(row));
+    };
+
+    // フォームの値をバインドする用の配列
+    let factors = reactive([
+      { name: 'サイズ', choices: 'S,M,L' },
+      { name: '色', choices: 'Red,Black,White,Blue' },
+      // { name: '値段', choices: '1000,3000,5000' },
+    ]);
+    const addFactor = () => {
+      factors.push({ name: '', choices: '' });
+    };
+    const removeFactor = (removeIndex, removeCount = 1) => {
+      factors.splice(removeIndex, removeCount);
+    };
+    const choicesList = computed(() => {
+      return factors.filter((factor) => factor.choices.trim() !== '').map((factor) => factor.choices.split(','));
+    });
+
+    return { factors, testCases, testCasesGrid, choicesList, addFactor, removeFactor, handleGenerate };
   },
 };
 </script>
+
+<style lang="scss" scoped>
+.form-container {
+  max-width: 800px;
+}
+
+.container {
+  max-width: 1000px;
+}
+</style>
